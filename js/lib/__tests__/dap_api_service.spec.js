@@ -3,10 +3,13 @@ import ApiDataItemFactory from "../../../spec/factories/api_data_item";
 
 describe("DapApiService", () => {
   const apiURL = "https://www.example.com";
+  const reports = [{ name: "Top Downloads", value: "download" }];
+  const agencies = [{ name: "Department of Interior", value: "interior" }];
+
   let subject;
 
   beforeEach(() => {
-    subject = new DapApiService(apiURL);
+    subject = new DapApiService(apiURL, reports, agencies);
   });
 
   describe("getReportForMonth", () => {
@@ -88,7 +91,10 @@ describe("DapApiService", () => {
 
     describe("when agency is provided", () => {
       describe("and the API has one page of data", () => {
-        const mockData = ApiDataItemFactory.buildList(5);
+        const mockData = ApiDataItemFactory.params({
+          report_name: report,
+          report_agency: agency,
+        }).buildList(5);
         const expectedURL = `https://www.example.com/agencies/${agency}/reports/${report}/data?after=2017-07-01&before=2017-07-31&limit=10000&page=1`;
         let requestURL;
         let requestOptions;
@@ -117,7 +123,13 @@ describe("DapApiService", () => {
 
         it("returns the expected data", () => {
           expect(actual).toEqual(
-            mockData.map(({ notice, id, ...remaining }) => remaining),
+            mockData.map(({ notice, id, ...remaining }) => {
+              return {
+                ...remaining,
+                report_name: reports[0].name,
+                report_agency: agencies[0].name,
+              };
+            }),
           );
         });
       });
@@ -129,7 +141,7 @@ describe("DapApiService", () => {
 
     describe("when agency is not provided", () => {
       describe("and the API has one page of data", () => {
-        const mockData = ApiDataItemFactory.buildList(5);
+        const mockData = ApiDataItemFactory.buildList(2);
         const expectedURL = `https://www.example.com/reports/${report}/data?after=2017-07-01&before=2017-07-31&limit=10000&page=1`;
         let requestURL;
         let requestOptions;

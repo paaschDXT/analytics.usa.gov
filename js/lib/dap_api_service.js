@@ -119,8 +119,12 @@ class DapApiService {
   }
 
   /**
-   * Removes notice and id keys.  Maps report and agency keys to the display
-   * names provided in the constructor.
+   * Removes notice and id keys.  Maps report_name and agency_name keys to the
+   * display names provided in the constructor.
+   *
+   * TODO: This logic doesn't belong here, since it isn't related to
+   * communications with the API. Refactor and move to a data
+   * formatting/transforming class later.
    *
    * @param {Object[]} jsonArray
    * @returns {Object[]} JSON array with unneeded keys removed and report/agency
@@ -131,17 +135,17 @@ class DapApiService {
       return jsonArray;
     }
 
-    const reportName = this.#reports.find((report) => {
-      return report.value == jsonArray[0].report;
+    const report = this.#reports.find((report) => {
+      return report.value == jsonArray[0].report_name;
     });
-    const agencyName = this.#agencies.find((agency) => {
-      return agency.value == jsonArray[0].agency;
+    const agency = this.#agencies.find((agency) => {
+      return agency.value == jsonArray[0].report_agency;
     });
     return jsonArray.map(
-      ({ notice, id, report, agency, ...remainingAttributes }) => {
+      ({ notice, id, report_name, report_agency, ...remainingAttributes }) => {
         return {
-          report: reportName ? reportName : report,
-          agency: agencyName ? agencyName : agency,
+          report_name: report ? report.name : report_name,
+          report_agency: agency ? agency.name : report_agency,
           ...remainingAttributes,
         };
       },

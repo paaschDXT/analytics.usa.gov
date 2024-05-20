@@ -71,7 +71,7 @@ function HistoricalDataDownloads({ apiURL, mainAgencyName, agencies }) {
       name: "Windows version and browser",
     },
   ];
-  const dapApiService = new DapApiService(apiURL, apiReports, agencies);
+  const dapApiService = new DapApiService(apiURL, apiReports, parsedAgencies);
 
   const [report, setReport] = useState("");
   const [agency, setAgency] = useState("");
@@ -123,7 +123,8 @@ function HistoricalDataDownloads({ apiURL, mainAgencyName, agencies }) {
 
         triggerBrowserDownload(data, contentHeader, fileName);
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e);
         setError(true);
       })
       .finally(() => {
